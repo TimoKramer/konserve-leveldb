@@ -1,9 +1,10 @@
 (ns konserve-leveldb.core-test
-  (:require [clojure.test :refer [deftest is testing use-fixtures]]
+  (:require [clojure.test :refer [deftest with-test is testing use-fixtures]]
             [clojure.core.async :refer [<!!] :as async]
             [konserve.core :as k]
             [konserve.storage-layout :as kl]
             [konserve-leveldb.core :refer [new-leveldb-store delete-store]]
+            [konserve.compliance-test :refer [compliance-test]]
             [malli.generator :as mg]
             [clojure.java.io :as io])
   (:import  [java.io File]))
@@ -262,3 +263,10 @@
       (is (exception? (<!! (kl/-put-raw-meta corrupt :bad (byte-array (range 10))))))
       (is (exception? (<!! (delete-store corrupt))))
       (delete-store store))))
+
+(deftest run-compliance-test
+  (let [_ (println "Compliance testing")
+        path "./temp/compliance-test"
+        store (<!! (new-leveldb-store path))]
+    (compliance-test store)
+    (delete-store store)))
