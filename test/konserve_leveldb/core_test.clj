@@ -12,7 +12,7 @@
 
 (defn exception? [thing]
   (instance? Throwable thing))
-        
+
 (defn delete-recursively [fname]
   (let [func (fn [func f]
                (when (.isDirectory ^File f)
@@ -37,7 +37,7 @@
       (is (= nil (<!! (k/get-meta store :foo))))
       (is (not (<!! (k/exists? store :foo))))
       (is (= :default (<!! (k/get-in store [:fuu] :default))))
-      (<!! (k/bget store :foo (fn [res] 
+      (<!! (k/bget store :foo (fn [res]
                                 (is (nil? res))))))))
 
 (deftest write-value-test
@@ -91,16 +91,16 @@
                                     (reset! cb true)
                                     (is (= (map byte (slurp (:input-stream res)))
                                            (range 30))))))
-      (<!! (k/bassoc store :binbar (byte-array (map inc (range 30))))) 
+      (<!! (k/bassoc store :binbar (byte-array (map inc (range 30)))))
       (<!! (k/bget store :binbar (fn [res]
                                     (reset! cb2 true)
                                     (is (= (map byte (slurp (:input-stream res)))
-                                           (map inc (range 30)))))))                                          
+                                           (map inc (range 30)))))))
       (is (<!! (k/exists? store :binbar)))
       (is @cb)
       (is @cb2)
       (delete-store store))))
-  
+
 (deftest key-test
   (testing "Test getting keys from the store"
     (let [_ (println "Getting keys from store")
@@ -110,7 +110,7 @@
       (<!! (k/assoc store :baz 20))
       (<!! (k/assoc store :binbar 20))
       (is (= #{:baz :binbar} (<!! (async/into #{} (k/keys store)))))
-      (delete-store store))))  
+      (delete-store store))))
 
 (deftest append-test
   (testing "Test the append store functionality."
@@ -160,24 +160,24 @@
           num1 (mg/generate pos-int? {:size 5 :seed 4})
           num2 (mg/generate pos-int? {:size 5 :seed 5})
           floater (mg/generate float? {:size 5 :seed 6})]
-      
+
       (<!! (k/assoc store name addressless))
-      (is (= addressless 
+      (is (= addressless
              (<!! (k/get store name))))
 
       (<!! (k/assoc-in store [name :address] address))
-      (is (= home 
+      (is (= home
              (<!! (k/get store name))))
 
       (<!! (k/update-in store [name :capacity] * floater))
-      (is (= (* floater (:capacity home)) 
-             (<!! (k/get-in store [name :capacity]))))  
+      (is (= (* floater (:capacity home))
+             (<!! (k/get-in store [name :capacity]))))
 
       (<!! (k/update-in store [name :address :number] + num1 num2))
-      (is (= (+ num1 num2 (:number address)) 
-             (<!! (k/get-in store [name :address :number]))))             
-      
-      (delete-store store))))   
+      (is (= (+ num1 num2 (:number address))
+             (<!! (k/get-in store [name :address :number]))))
+
+      (delete-store store))))
 
 (deftest bulk-test
   (testing "Bulk data test."
@@ -195,7 +195,7 @@
       (<!! (k/bget store :binary (fn [{:keys [input-stream]}]
                                     (is (= (pmap byte (slurp input-stream))
                                            sevens)))))
-      (delete-store store))))         
+      (delete-store store))))
 
 (deftest raw-meta-test
   (testing "Test header storage"
@@ -213,8 +213,8 @@
         (is (= header [1 1 1 0]))
         (is (nil? mraw3))
         (is (= :eye (:key (<!! (k/get-meta store :foo)))))
-        (is (= :eye (:key (<!! (k/get-meta store :baritone))))))        
-      (delete-store store))))          
+        (is (= :eye (:key (<!! (k/get-meta store :baritone))))))
+      (delete-store store))))
 
 (deftest raw-value-test
   (testing "Test value storage"
@@ -232,8 +232,8 @@
         (is (= header [1 1 1 0]))
         (is (nil? vraw3))
         (is (= :ear (<!! (k/get store :foo))))
-        (is (= :ear (<!! (k/get store :baritone)))))      
-      (delete-store store))))  
+        (is (= :ear (<!! (k/get store :baritone)))))
+      (delete-store store))))
 
 (deftest exceptions-test
   (testing "Test exception handling"
@@ -241,9 +241,9 @@
           path "./temp/exceptions-test"
           store (<!! (new-leveldb-store path))
           params (clojure.core/keys store)
-          corruptor (fn [s k] 
+          corruptor (fn [s k]
                         (if (= (type (k s)) clojure.lang.Atom)
-                          (clojure.core/assoc-in s [k] (atom {})) 
+                          (clojure.core/assoc-in s [k] (atom {}))
                           (clojure.core/assoc-in s [k] (UnknownType.))))
           corrupt (reduce corruptor store params)] ; let's corrupt our store
       (is (exception? (<!! (k/get corrupt :bad))))
@@ -254,7 +254,7 @@
       (is (exception? (<!! (k/update-in corrupt [:bad :robot] inc))))
       (is (exception? (<!! (k/exists? corrupt :bad))))
       (is (exception? (<!! (k/keys corrupt))))
-      (is (exception? (<!! (k/bget corrupt :bad (fn [_] nil)))))   
+      (is (exception? (<!! (k/bget corrupt :bad (fn [_] nil)))))
       (is (exception? (<!! (k/bassoc corrupt :binbar (byte-array (range 10))))))
       (is (exception? (<!! (kl/-get-raw-value corrupt :bad))))
       (is (exception? (<!! (kl/-put-raw-value corrupt :bad (byte-array (range 10))))))

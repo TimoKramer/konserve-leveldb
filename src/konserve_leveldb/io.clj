@@ -17,45 +17,45 @@
 (defn id->data [id]
   (str id "/data"))
 
-(defn it-exists? 
+(defn it-exists?
   [db id]
   (some? (ldb/get db (id->meta id))))
-  
-(defn get-it 
+
+(defn get-it
   [db id]
   (let [meta (ldb/get db (id->meta id))
         data (ldb/get db (id->data id))]
     [(split-header meta) (split-header data)]))
 
-(defn get-it-only 
+(defn get-it-only
   [db id]
-  (split-header (ldb/get db (id->data id))))  
+  (split-header (ldb/get db (id->data id))))
 
 (defn get-meta
   [db id]
-  (split-header (ldb/get db (id->meta id))))  
+  (split-header (ldb/get db (id->meta id))))
 
-(defn delete-it 
+(defn delete-it
   [db id]
   (ldb/delete db (id->meta id) (id->data id)))
 
-(defn update-it 
+(defn update-it
   [db id data]
   (ldb/put db (id->meta id) (first data) (id->data id) (second data)))
-  
-(defn get-keys 
+
+(defn get-keys
   [db]
   (map #(split-header (second %)) (ldb/iterator db)))
 
-(defn raw-get-it-only 
+(defn raw-get-it-only
   [db id]
   (ldb/get db (id->data id)))
 
-(defn raw-get-meta 
+(defn raw-get-meta
   [db id]
   (ldb/get db (id->meta id)))
-  
-(defn raw-update-it-only 
+
+(defn raw-update-it-only
   [db id data]
   (when data
     (ldb/put db (id->data id) data)))
@@ -63,4 +63,4 @@
 (defn raw-update-meta
   [db id meta]
   (when meta
-    (ldb/put db (id->meta id) meta)))  
+    (ldb/put db (id->meta id) meta)))
