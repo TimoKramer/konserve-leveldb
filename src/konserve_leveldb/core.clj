@@ -16,7 +16,7 @@
                                         PKeyIterable
                                         -keys]]
             [konserve.storage-layout :refer [SplitLayout]])
-  (:import  [java.io ByteArrayOutputStream]
+  (:import  [java.io ByteArrayOutputStream IOException]
             [org.iq80.leveldb DB]))
 
 (set! *warn-on-reflection* 1)
@@ -27,6 +27,7 @@
   [key]
   (str (hasch/uuid key)))
 
+;; TODO macro?
 (defn prep-ex
   [^String message ^Exception e]
   ; (.printStackTrace e)
@@ -269,7 +270,8 @@
                                 :read-handlers read-handlers
                                 :write-handlers write-handlers
                                 :locks (atom {})})))
-        (catch Exception e (async/put! res-ch (prep-ex "Failed to dbect to store" e)))))
+       (catch IOException e (async/put! res-ch (prep-ex "Failed to create store because LOCK already held by process." e)))
+       (catch Exception e (async/put! res-ch (prep-ex "Failed to connect to store" e)))))
     res-ch))
 
 (defn release
