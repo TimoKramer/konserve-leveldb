@@ -6,8 +6,8 @@
   :aot :all
   :dependencies [[org.clojure/clojure "1.10.2-alpha1"]
                  [factual/clj-leveldb "0.1.1"]
-                 [byte-streams "0.2.2"] ;required for clj-leveldb to work https://github.com/ztellman/clj-tuple/issues/18
-                 [io.replikativ/konserve "0.6.0-alpha1"]]
+                 [byte-streams "0.2.4"] ;required for clj-leveldb to work https://github.com/ztellman/clj-tuple/issues/18
+                 [io.replikativ/konserve "0.6.0-alpha2"]]
   :repl-options {:init-ns konserve-leveldb.core}
   :plugins [[lein-cloverage "1.2.0"]]
   :profiles { :dev {:dependencies [[metosin/malli "0.0.1-20200404.091302-14"]]}})
